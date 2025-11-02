@@ -73,10 +73,30 @@ class PhotoViewGestureDetector extends StatelessWidget {
       },
     );
 
-    return RawGestureDetector(
-      behavior: behavior,
-      child: child,
-      gestures: gestures,
+    return Listener(
+      child: RawGestureDetector(
+        behavior: behavior,
+        child: child,
+        gestures: gestures,
+      ),
+      onPointerPanZoomStart: (event) {
+        onScaleStart?.call(ScaleStartDetails(kind: event.kind));
+      },
+      onPointerPanZoomUpdate: (event) {
+        onScaleUpdate?.call(
+            ScaleUpdateDetails(scale: event.scale, focalPoint: event.position));
+      },
+      onPointerPanZoomEnd: (event) {
+        onScaleEnd?.call(ScaleEndDetails());
+      },
+      onPointerSignal: (event) {
+        if (event is PointerScaleEvent) {
+          onScaleStart?.call(ScaleStartDetails(kind: event.kind));
+          onScaleUpdate?.call(ScaleUpdateDetails(
+              scale: event.scale, focalPoint: event.position));
+          onScaleEnd?.call(ScaleEndDetails());
+        }
+      },
     );
   }
 }
