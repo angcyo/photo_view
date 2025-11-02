@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'photo_view_hit_corners.dart';
@@ -95,6 +96,17 @@ class PhotoViewGestureDetector extends StatelessWidget {
           onScaleUpdate?.call(ScaleUpdateDetails(
               scale: event.scale, focalPoint: event.position));
           onScaleEnd?.call(ScaleEndDetails());
+        } else if (event is PointerScrollEvent) {
+          final keyboard = HardwareKeyboard.instance;
+          if (keyboard.isLogicalKeyPressed(LogicalKeyboardKey.control) ||
+              keyboard.isLogicalKeyPressed(LogicalKeyboardKey.controlLeft) ||
+              keyboard.isLogicalKeyPressed(LogicalKeyboardKey.controlRight)) {
+            onScaleStart?.call(ScaleStartDetails(kind: event.kind));
+            onScaleUpdate?.call(ScaleUpdateDetails(
+                scale: event.scrollDelta.dy > 0 ? 1.6 : 0.6,
+                focalPoint: event.position));
+            onScaleEnd?.call(ScaleEndDetails());
+          }
         }
       },
     );
